@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Seleção de Elementos
+    // =================================================
+    // 1. SELEÇÃO DE TODOS OS ELEMENTOS DO HTML
+    // =================================================
+    const roletaContainer = document.querySelector('.roleta-container');
     const roletaCanvas = document.getElementById('roleta');
     const premioForm = document.getElementById('premio-form');
     const premioInput = document.getElementById('premio-input');
@@ -11,14 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('modal-overlay');
     const premioGanhoP = document.getElementById('premio-ganho');
     const fecharModalBtn = document.getElementById('fechar-modal-btn');
-
-    // MUDANÇA: Novo seletor para o logo animado
     const logoAnimado = document.getElementById('logo-animado');
 
     const ctx = roletaCanvas.getContext('2d');
 
-    // MUDANÇA: Não precisamos mais carregar o logo no JS
-
+    // =================================================
+    // 2. ESTADO INICIAL DA APLICAÇÃO
+    // =================================================
     let premios = [
         { texto: 'Mentoria Gratuita', cor: '#FFE902' },
         { texto: '50% OFF - Curso', cor: '#f0f0f0' },
@@ -31,7 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let anguloAtual = 0;
     let girando = false;
 
-    // Funções do Modal e Confetes (sem alterações)
+    // =================================================
+    // 3. FUNÇÕES AUXILIARES (MODAL, CONFETES, DEBOUNCE)
+    // =================================================
     function dispararConfetes() {
         const duracao = 3 * 1000;
         const fim = Date.now() + duracao;
@@ -42,16 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (Date.now() < fim) { requestAnimationFrame(frame); }
         }());
     }
+
     function mostrarModal(textoPremio) {
         premioGanhoP.textContent = textoPremio;
         modalOverlay.classList.remove('hidden');
-        if (textoPremio !== 'Tente Outra Vez') { dispararConfetes(); }
+        if (textoPremio !== 'Tente Outra Vez') {
+            dispararConfetes();
+        }
     }
+
     function esconderModal() {
         modalOverlay.classList.add('hidden');
     }
 
-    // Função de Desenho da Roleta (simplificada)
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // =================================================
+    // 4. LÓGICA DE DESENHO E RESPONSIVIDADE
+    // =================================================
     function desenharRoleta() {
         const numPremios = premios.length;
         if (numPremios === 0) return;
@@ -60,7 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const centroX = roletaCanvas.width / 2;
         const centroY = roletaCanvas.height / 2;
         const raio = roletaCanvas.width / 2;
-        const raioDoBuraco = 95;
+
+        const raioDoBuraco = raio * 0.38;
+        const tamanhoFonte = Math.max(10, raio * 0.06);
 
         ctx.clearRect(0, 0, roletaCanvas.width, roletaCanvas.height);
 
@@ -76,23 +96,35 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
             ctx.save();
             ctx.fillStyle = '#333';
-            ctx.font = '600 15px Poppins, sans-serif';
+            ctx.font = `600 ${tamanhoFonte}px Poppins, sans-serif`;
             ctx.translate(centroX, centroY);
             ctx.rotate(anguloInicio + anguloPorPremio / 2);
             ctx.textAlign = 'center';
             const textX = raioDoBuraco + (raio - raioDoBuraco) / 2;
-            ctx.fillText(premio.texto, textX, 5);
+            ctx.fillText(premio.texto, textX, tamanhoFonte / 3);
             ctx.restore();
         });
 
-        // MUDANÇA: Não desenhamos mais o logo aqui, apenas o buraco
         ctx.beginPath();
         ctx.arc(centroX, centroY, raioDoBuraco, 0, 2 * Math.PI);
         ctx.fillStyle = '#2c2c2c';
         ctx.fill();
     }
 
-    // Função de Girar (com o bug corrigido)
+    function configurarERedesenhar() {
+        const tamanho = roletaContainer.clientWidth;
+        const dpr = window.devicePixelRatio || 1;
+        roletaCanvas.width = tamanho * dpr;
+        roletaCanvas.height = tamanho * dpr;
+        roletaCanvas.style.width = `${tamanho}px`;
+        roletaCanvas.style.height = `${tamanho}px`;
+        ctx.scale(dpr, dpr);
+        desenharRoleta();
+    }
+
+    // =================================================
+    // 5. LÓGICA DO JOGO (ANIMAÇÃO E GIRO)
+    // =================================================
     function girarRoleta() {
         girando = true;
         somGiro.currentTime = 0;
@@ -105,40 +137,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             girando = false;
-            logoAnimado.style.pointerEvents = 'auto'; // Permite clicar novamente
+            logoAnimado.style.pointerEvents = 'auto';
             somGiro.pause();
             somPremio.play();
             const anguloNormalizado = anguloFinal % (2 * Math.PI);
             const anguloPorPremio = (2 * Math.PI) / premios.length;
 
-            // ================== A CORREÇÃO DO BUG ESTÁ AQUI ==================
-            // O ponteiro está em 270 graus (topo), que é (3 * PI / 2) radianos.
-            const anguloDoPonteiro = 3 * Math.PI / 2;
+            // CÁLCULO CORRIGIDO DO PRÊMIO
+            const anguloDoPonteiro = 3 * Math.PI / 2; // Ponteiro no topo (270 graus)
             const anguloCorrigido = (2 * Math.PI - anguloNormalizado + anguloDoPonteiro) % (2 * Math.PI);
             const indiceVencedor = Math.floor(anguloCorrigido / anguloPorPremio);
-            // ================================================================
 
             setTimeout(() => {
                 mostrarModal(premios[indiceVencedor].texto);
             }, 500);
+
             roletaCanvas.style.transition = 'none';
             anguloAtual = anguloNormalizado;
             roletaCanvas.style.transform = `rotate(${anguloAtual}rad)`;
-        }, 5000); // Duração do giro
+        }, 5000);
     }
 
-    // MUDANÇA: Nova função para iniciar a animação e o giro
     function iniciarJogo() {
         if (girando) return;
 
         logoAnimado.classList.add('animado-final');
-        logoAnimado.style.pointerEvents = 'none'; // Desabilita cliques durante a animação/giro
+        logoAnimado.style.pointerEvents = 'none';
 
-        // Espera a animação do logo terminar (800ms) para começar a girar a roleta
         setTimeout(girarRoleta, 800);
     }
 
-    // ... (demais funções handle... permanecem as mesmas) ...
+    // =================================================
+    // 6. FUNÇÕES DE GERENCIAMENTO DE PRÊMIOS (CRUD)
+    // =================================================
     function renderizarListaPremios() {
         listaPremiosUl.innerHTML = '';
         premios.forEach((premio, index) => {
@@ -149,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-editar').forEach(btn => btn.addEventListener('click', handleEditar));
         document.querySelectorAll('.btn-excluir').forEach(btn => btn.addEventListener('click', handleExcluir));
     }
+
     function handleFormSubmit(event) {
         event.preventDefault();
         const textoPremio = premioInput.value.trim();
@@ -166,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         desenharRoleta();
         renderizarListaPremios();
     }
+
     function handleEditar(event) {
         const index = event.target.dataset.index;
         premioInput.value = premios[index].texto;
@@ -173,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         premioForm.querySelector('button').textContent = 'Salvar Alteração';
         premioInput.focus();
     }
+
     function handleExcluir(event) {
         const index = event.target.dataset.index;
         if (confirm(`Tem certeza que deseja excluir o prêmio "${premios[index].texto}"?`)) {
@@ -182,10 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-    // MUDANÇA: O clique agora é no logo
+    // =================================================
+    // 7. INICIALIZAÇÃO DA APLICAÇÃO E EVENTOS
+    // =================================================
     logoAnimado.addEventListener('click', iniciarJogo);
-
     premioForm.addEventListener('submit', handleFormSubmit);
     fecharModalBtn.addEventListener('click', esconderModal);
     modalOverlay.addEventListener('click', (event) => {
@@ -194,9 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // A inicialização agora só precisa esperar as fontes
     document.fonts.ready.then(() => {
-        desenharRoleta();
+        configurarERedesenhar();
         renderizarListaPremios();
     });
+
+    window.addEventListener('resize', debounce(configurarERedesenhar, 100));
 });

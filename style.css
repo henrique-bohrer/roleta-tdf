@@ -31,13 +31,15 @@ header h1 {
 
 .roleta-container {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 100%; /* Ocupa 100% do espaço disponível no 'main' */
+    max-width: 500px; /* Mas não passa de 500px */
     margin: 2rem auto;
+    aspect-ratio: 1 / 1; /* Garante que seja sempre um quadrado perfeito */
 }
 
 #roleta {
-    /* A transição suave no 'transform' é o que cria a animação de giro */
+    width: 100%;
+    height: 100%;
     transition: transform 5s ease-out;
 }
 
