@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roleta de Prêmios - TDF</title>
   <link rel="stylesheet" href="style.css">
-
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-
 </head>
 
 <body>
@@ -21,10 +19,10 @@
 
     <main>
       <div class="roleta-container">
-        <canvas id="roleta" width="400" height="400"></canvas>
+        <canvas id="roleta" width="500" height="500"></canvas>
         <div class="ponteiro"></div>
+        <img src="logo-TDF-sem-fundo.png" alt="Logo TDF - Clique para girar" id="logo-animado">
       </div>
-      <button id="girar-btn">Girar a Roleta!</button>
     </main>
 
     <section class="gerenciador-premios">
@@ -34,8 +32,7 @@
         <input type="hidden" id="edit-index">
         <button type="submit">Adicionar Prêmio</button>
       </form>
-      <ul id="lista-premios">
-      </ul>
+      <ul id="lista-premios"></ul>
     </section>
   </div>
 
