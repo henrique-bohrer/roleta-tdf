@@ -33,12 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let girando = false;
 
     // --- FUNÇÕES DO MODAL E CONFETES ---
-
-    /**
-     * Dispara um efeito de confetes com cores sólidas e na frente de todos os elementos.
-     */
     function dispararConfetes() {
-        const duracao = 3 * 1000; // 3 segundos
+        const duracao = 3 * 1000;
         const fim = Date.now() + duracao;
         const cores = ['#FFE902', '#FFFFFF', '#1a1a1a'];
 
@@ -50,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 origin: { x: 0 },
                 colors: cores,
                 flat: true,
-                zIndex: 2000 // <-- AQUI ESTÁ A CORREÇÃO! Força os confetes para a frente.
+                zIndex: 2000
             });
             confetti({
                 particleCount: 3,
@@ -59,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 origin: { x: 1 },
                 colors: cores,
                 flat: true,
-                zIndex: 2000 // <-- AQUI ESTÁ A CORREÇÃO! Força os confetes para a frente.
+                zIndex: 2000
             });
 
             if (Date.now() < fim) {
@@ -105,11 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.stroke();
             ctx.save();
             ctx.fillStyle = '#333';
-            ctx.font = 'bold 16px Poppins';
+            // AQUI ESTÁ A MUDANÇA PRINCIPAL NA FONTE
+            ctx.font = '600 16px Poppins, sans-serif';
             ctx.translate(centroX, centroY);
             ctx.rotate(anguloInicio + anguloPorPremio / 2);
             ctx.textAlign = 'right';
-            ctx.fillText(premio.texto, raio - 10, 10);
+            ctx.fillText(premio.texto, raio - 15, 5); // Pequeno ajuste de posição
             ctx.restore();
         });
     }
@@ -198,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    desenharRoleta();
-    renderizarListaPremios();
+    // CORREÇÃO PARA GARANTIR QUE A FONTE SEJA CARREGADA ANTES DE DESENHAR
+    document.fonts.ready.then(() => {
+        console.log('Fontes carregadas. Desenhando a roleta.');
+        desenharRoleta();
+        renderizarListaPremios();
+    });
 });
