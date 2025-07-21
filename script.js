@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. ESTADO INICIAL DA APLICAÇÃO
     // =================================================
     let premios = [
-        { texto: 'Mentoria Gratuita', cor: '#FFE902' },
-        { texto: '50% OFF - Curso', cor: '#f0f0f0' },
-        { texto: 'E-book Exclusivo', cor: '#FFE902' },
-        { texto: 'Vaga na Imersão', cor: '#f0f0f0' },
-        { texto: 'Análise de Vídeo', cor: '#FFE902' },
+        { texto: 'Comissão 2x no Mês', cor: '#FFE902' },
+        { texto: 'Folga Extra Premiada', cor: '#f0f0f0' },
+        { texto: 'Vale iFood R$100', cor: '#FFE902' },
+        { texto: 'Meio Período Livre', cor: '#f0f0f0' },
+        { texto: 'Café com a Diretoria', cor: '#FFE902' },
         { texto: 'Tente Outra Vez', cor: '#f0f0f0' },
     ];
 
@@ -114,11 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function configurarERedesenhar() {
         const tamanho = roletaContainer.clientWidth;
         const dpr = window.devicePixelRatio || 1;
-        roletaCanvas.width = tamanho * dpr;
-        roletaCanvas.height = tamanho * dpr;
+
         roletaCanvas.style.width = `${tamanho}px`;
         roletaCanvas.style.height = `${tamanho}px`;
-        ctx.scale(dpr, dpr);
+
+        roletaCanvas.width = tamanho * dpr;
+        roletaCanvas.height = tamanho * dpr;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
         desenharRoleta();
     }
 
@@ -142,9 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
             somPremio.play();
             const anguloNormalizado = anguloFinal % (2 * Math.PI);
             const anguloPorPremio = (2 * Math.PI) / premios.length;
-
-            // CÁLCULO CORRIGIDO DO PRÊMIO
-            const anguloDoPonteiro = 3 * Math.PI / 2; // Ponteiro no topo (270 graus)
+            const anguloDoPonteiro = 3 * Math.PI / 2;
             const anguloCorrigido = (2 * Math.PI - anguloNormalizado + anguloDoPonteiro) % (2 * Math.PI);
             const indiceVencedor = Math.floor(anguloCorrigido / anguloPorPremio);
 
@@ -160,10 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function iniciarJogo() {
         if (girando) return;
-
         logoAnimado.classList.add('animado-final');
         logoAnimado.style.pointerEvents = 'none';
-
         setTimeout(girarRoleta, 800);
     }
 
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             premios.push({ texto: textoPremio, cor: novaCor });
         }
         premioInput.value = '';
-        desenharRoleta();
+        configurarERedesenhar(); // Usa a função responsiva para redesenhar
         renderizarListaPremios();
     }
 
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const index = event.target.dataset.index;
         if (confirm(`Tem certeza que deseja excluir o prêmio "${premios[index].texto}"?`)) {
             premios.splice(index, 1);
-            desenharRoleta();
+            configurarERedesenhar(); // Usa a função responsiva para redesenhar
             renderizarListaPremios();
         }
     }
@@ -234,4 +234,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('resize', debounce(configurarERedesenhar, 100));
+
 });

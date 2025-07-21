@@ -156,11 +156,14 @@ header h1 {
 
 /* Estado Final: Pequeno e no centro, após o clique */
 #logo-animado.animado-final {
-    width: 150px; /* Tamanho do logo no centro */
-    height: 150px;
+    /* MUDANÇA: Tamanho agora é proporcional ao container da roleta */
+    width: 38%;
+    height: 38%;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centraliza perfeitamente */
+    transform: translate(-50%, -50%);
+    background-color: transparent;
+    padding: 0;
 }
 
 /* Esconde o ponteiro no início para não ficar por cima do logo grande */
