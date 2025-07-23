@@ -1,64 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // =================================================
-    // 1. SELEÇÃO DE TODOS OS ELEMENTOS DO HTML
-    // =================================================
+    // 1. SELEÇÃO DE ELEMENTOS
     const roletaContainer = document.querySelector('.roleta-container');
     const roletaCanvas = document.getElementById('roleta');
-    const premioForm = document.getElementById('premio-form');
-    const premioInput = document.getElementById('premio-input');
-    const listaPremiosUl = document.getElementById('lista-premios');
-    const editIndexInput = document.getElementById('edit-index');
     const somGiro = document.getElementById('som-giro');
     const somPremio = document.getElementById('som-premio');
     const modalOverlay = document.getElementById('modal-overlay');
     const premioGanhoP = document.getElementById('premio-ganho');
     const fecharModalBtn = document.getElementById('fechar-modal-btn');
     const logoAnimado = document.getElementById('logo-animado');
-
     const ctx = roletaCanvas.getContext('2d');
 
-    // =================================================
-    // 2. ESTADO INICIAL DA APLICAÇÃO
-    // =================================================
+    // 2. ESTADO INICIAL (com a lista de prêmios final e fixa)
     let premios = [
-        { texto: 'Comissão 2x no Mês', cor: '#FFE902' },
-        { texto: 'Folga Extra Premiada', cor: '#f0f0f0' },
-        { texto: 'Vale iFood R$100', cor: '#FFE902' },
-        { texto: 'Meio Período Livre', cor: '#f0f0f0' },
-        { texto: 'Café com a Diretoria', cor: '#FFE902' },
-        { texto: 'Tente Outra Vez', cor: '#f0f0f0' },
+        { texto: 'Comissão DOBRADA', cor: '#FFE902' },
+        { texto: 'Vale Almoço', cor: '#f0f0f0' },
+        { texto: 'Energético', cor: '#FFE902' },
+        { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
+        { texto: 'Gelato', cor: '#FFE902' },
+        { texto: 'Comissão TRIPLICADA', cor: '#f0f0f0' },
+        { texto: 'Bombom', cor: '#FFE902' },
+        { texto: 'Brinde TDF', cor: '#f0f0f0' },
+        { texto: 'Cupom PRESENTE', cor: '#FFE902' },
+        { texto: 'Salva de Palmas', cor: '#f0f0f0' }
     ];
 
     let anguloAtual = 0;
     let girando = false;
 
-    // =================================================
-    // 3. FUNÇÕES AUXILIARES (MODAL, CONFETES, DEBOUNCE)
-    // =================================================
+    // 3. FUNÇÕES AUXILIARES
+    // FUNÇÃO DE CONFETES ATUALIZADA
     function dispararConfetes() {
-        const duracao = 3 * 1000;
-        const fim = Date.now() + duracao;
-        const cores = ['#FFE902', '#FFFFFF', '#1a1a1a'];
-        (function frame() {
-            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: cores, flat: true, zIndex: 2000 });
-            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: cores, flat: true, zIndex: 2000 });
-            if (Date.now() < fim) { requestAnimationFrame(frame); }
-        }());
+        // 1. A grande explosão inicial
+        confetti({
+            particleCount: 150,
+            spread: 180,
+            origin: { y: 0.6 },
+            gravity: 0.5,
+            colors: ['#FFE902', '#FFFFFF', '#1a1a1a'],
+            flat: true,
+            zIndex: 2000
+        });
+
+        // 2. Pequenas explosões aleatórias (fogos de artifício)
+        const duracaoFogos = 2 * 1000;
+        const fimFogos = Date.now() + duracaoFogos;
+
+        const interval = setInterval(() => {
+            if (Date.now() > fimFogos) {
+                return clearInterval(interval);
+            }
+            confetti({
+                particleCount: 5,
+                angle: Math.random() * 360,
+                spread: 55,
+                origin: { x: Math.random(), y: Math.random() - 0.2 },
+                colors: ['#FFE902', '#FFFFFF'],
+                flat: true,
+                zIndex: 2000,
+                gravity: 0.8
+            });
+        }, 150);
     }
 
     function mostrarModal(textoPremio) {
         premioGanhoP.textContent = textoPremio;
         modalOverlay.classList.remove('hidden');
-        if (textoPremio !== 'Tente Outra Vez') {
+        if (textoPremio !== 'Salva de Palmas' && textoPremio !== 'Bombom' && textoPremio !== 'Tente Outra Vez') {
             dispararConfetes();
         }
     }
-
     function esconderModal() {
         modalOverlay.classList.add('hidden');
     }
-
     function debounce(func, delay) {
         let timeout;
         return function(...args) {
@@ -67,17 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // =================================================
     // 4. LÓGICA DE DESENHO E RESPONSIVIDADE
-    // =================================================
     function desenharRoleta() {
         const numPremios = premios.length;
         if (numPremios === 0) return;
 
-        const anguloPorPremio = (2 * Math.PI) / numPremios;
+        const raio = roletaCanvas.width / (window.devicePixelRatio || 1) / 2;
         const centroX = roletaCanvas.width / 2;
         const centroY = roletaCanvas.height / 2;
-        const raio = roletaCanvas.width / 2;
+        const anguloPorPremio = (2 * Math.PI) / numPremios;
 
         const raioDoBuraco = raio * 0.38;
         const tamanhoFonte = Math.max(10, raio * 0.06);
@@ -89,24 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const anguloFim = (i + 1) * anguloPorPremio;
             ctx.beginPath();
             ctx.moveTo(centroX, centroY);
-            ctx.arc(centroX, centroY, raio, anguloInicio, anguloFim);
+            ctx.arc(centroX, centroY, raio * (window.devicePixelRatio || 1), anguloInicio, anguloFim);
             ctx.closePath();
             ctx.fillStyle = premio.cor;
             ctx.fill();
-            ctx.stroke();
             ctx.save();
             ctx.fillStyle = '#333';
-            ctx.font = `600 ${tamanhoFonte}px Poppins, sans-serif`;
+            ctx.font = `600 ${tamanhoFonte * (window.devicePixelRatio || 1)}px Poppins, sans-serif`;
             ctx.translate(centroX, centroY);
             ctx.rotate(anguloInicio + anguloPorPremio / 2);
             ctx.textAlign = 'center';
-            const textX = raioDoBuraco + (raio - raioDoBuraco) / 2;
-            ctx.fillText(premio.texto, textX, tamanhoFonte / 3);
+            const textX = (raioDoBuraco + (raio - raioDoBuraco) / 2) * (window.devicePixelRatio || 1);
+            ctx.fillText(premio.texto, textX, (tamanhoFonte / 3) * (window.devicePixelRatio || 1));
             ctx.restore();
         });
 
         ctx.beginPath();
-        ctx.arc(centroX, centroY, raioDoBuraco, 0, 2 * Math.PI);
+        ctx.arc(centroX, centroY, raioDoBuraco * (window.devicePixelRatio || 1), 0, 2 * Math.PI);
         ctx.fillStyle = '#2c2c2c';
         ctx.fill();
     }
@@ -114,21 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function configurarERedesenhar() {
         const tamanho = roletaContainer.clientWidth;
         const dpr = window.devicePixelRatio || 1;
-
         roletaCanvas.style.width = `${tamanho}px`;
         roletaCanvas.style.height = `${tamanho}px`;
-
         roletaCanvas.width = tamanho * dpr;
         roletaCanvas.height = tamanho * dpr;
-
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
         desenharRoleta();
     }
 
-    // =================================================
-    // 5. LÓGICA DO JOGO (ANIMAÇÃO E GIRO)
-    // =================================================
+    // 5. LÓGICA DO JOGO
     function girarRoleta() {
         girando = true;
         somGiro.currentTime = 0;
@@ -167,60 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(girarRoleta, 800);
     }
 
-    // =================================================
-    // 6. FUNÇÕES DE GERENCIAMENTO DE PRÊMIOS (CRUD)
-    // =================================================
-    function renderizarListaPremios() {
-        listaPremiosUl.innerHTML = '';
-        premios.forEach((premio, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${premio.texto}</span><div class="botoes-acao"><button class="btn-editar" data-index="${index}">✏️</button><button class="btn-excluir" data-index="${index}">🗑️</button></div>`;
-            listaPremiosUl.appendChild(li);
-        });
-        document.querySelectorAll('.btn-editar').forEach(btn => btn.addEventListener('click', handleEditar));
-        document.querySelectorAll('.btn-excluir').forEach(btn => btn.addEventListener('click', handleExcluir));
-    }
+    // 6. FUNÇÕES DE GERENCIAMENTO (REMOVIDAS)
 
-    function handleFormSubmit(event) {
-        event.preventDefault();
-        const textoPremio = premioInput.value.trim();
-        const indexParaEditar = editIndexInput.value;
-        if (!textoPremio) return;
-        if (indexParaEditar !== '') {
-            premios[indexParaEditar].texto = textoPremio;
-            premioForm.querySelector('button').textContent = 'Adicionar Prêmio';
-            editIndexInput.value = '';
-        } else {
-            const novaCor = premios.length % 2 === 0 ? '#FFE902' : '#f0f0f0';
-            premios.push({ texto: textoPremio, cor: novaCor });
-        }
-        premioInput.value = '';
-        configurarERedesenhar(); // Usa a função responsiva para redesenhar
-        renderizarListaPremios();
-    }
-
-    function handleEditar(event) {
-        const index = event.target.dataset.index;
-        premioInput.value = premios[index].texto;
-        editIndexInput.value = index;
-        premioForm.querySelector('button').textContent = 'Salvar Alteração';
-        premioInput.focus();
-    }
-
-    function handleExcluir(event) {
-        const index = event.target.dataset.index;
-        if (confirm(`Tem certeza que deseja excluir o prêmio "${premios[index].texto}"?`)) {
-            premios.splice(index, 1);
-            configurarERedesenhar(); // Usa a função responsiva para redesenhar
-            renderizarListaPremios();
-        }
-    }
-
-    // =================================================
-    // 7. INICIALIZAÇÃO DA APLICAÇÃO E EVENTOS
-    // =================================================
+    // 7. INICIALIZAÇÃO E EVENTOS
     logoAnimado.addEventListener('click', iniciarJogo);
-    premioForm.addEventListener('submit', handleFormSubmit);
     fecharModalBtn.addEventListener('click', esconderModal);
     modalOverlay.addEventListener('click', (event) => {
         if (event.target === modalOverlay) {
@@ -230,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.fonts.ready.then(() => {
         configurarERedesenhar();
-        renderizarListaPremios();
     });
 
     window.addEventListener('resize', debounce(configurarERedesenhar, 100));
