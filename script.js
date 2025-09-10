@@ -13,16 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. ESTADO INICIAL (com a lista de prêmios final e fixa)
     let premios = [
-        { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
-        { texto: 'Comissão DOBRADA', cor: '#FFE902' },
+        { texto: 'Comissão DOBRADA', cor: '#f0f0f0' },
+        { texto: 'Cupom PRESENTE', cor: '#FFE902' },
         { texto: 'Vale Almoço', cor: '#f0f0f0' },
         { texto: 'Energético', cor: '#FFE902' },
         { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
         { texto: 'Gelato', cor: '#FFE902' },
         { texto: 'Comissão TRIPLICADA', cor: '#f0f0f0' },
         { texto: 'Bombom', cor: '#FFE902' },
-        { texto: 'Cupom PRESENTE', cor: '#FFE902' },
-        { texto: 'Salva de Palmas', cor: '#f0f0f0' }
+        { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
+        { texto: 'Salva de Palmas', cor: '#FFE902' }
     ];
 
     let anguloAtual = 0;
