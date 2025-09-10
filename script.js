@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { texto: 'Vale Almoço', cor: '#f0f0f0' },
         { texto: 'Energético', cor: '#FFE902' },
         { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
-        { texto: 'Gelato', cor: '#FFE902' },
+        { texto: 'Sorvete', cor: '#FFE902' },
         { texto: 'Comissão TRIPLICADA', cor: '#f0f0f0' },
         { texto: 'Bombom', cor: '#FFE902' },
         { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
