@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { texto: 'Gelato', cor: '#FFE902' },
         { texto: 'Comissão TRIPLICADA', cor: '#f0f0f0' },
         { texto: 'Bombom', cor: '#FFE902' },
-        { texto: 'Brinde TDF', cor: '#f0f0f0' },
+        { texto: 'Cupom PRESENTE', cor: '#f0f0f0' },
         { texto: 'Cupom PRESENTE', cor: '#FFE902' },
         { texto: 'Salva de Palmas', cor: '#f0f0f0' }
     ];
